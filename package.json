@@ -1,0 +1,21 @@
+{
+  "name": "worm-game",
+  "version": "0.1.0",
+  "description": "This is a worm game in CLI made with node js in order to learn machine learning, ironically.",
+  "main": "worm.js",
+  "scripts": {
+    "start": "nodemon worm.js"
+  },
+  "keywords": [
+    "worm",
+    "game",
+    "CLI",
+    "machine",
+    "learning"
+  ],
+  "author": "Michael Leonffu",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
+}

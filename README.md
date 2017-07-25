@@ -1,6 +1,6 @@
-# Worm-Game
+# Snake-Game
 
-This is a worm game in CLI made with node js in order to learn machine learning, ironically.
+This is a snake game in CLI made with node js in order to learn machine learning, ironically.
 
 ## Author
 

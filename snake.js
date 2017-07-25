@@ -9,17 +9,28 @@ stdin.addListener("data", function(d) {
 	console.log("you entered: [" + d.toString().trim() + "]");
 });
 
+var symbols = {
+	borders:{
+		leftRight: '|',
+		upDown: '='
+	},
+	blankSpace: '+',
+	apple: 'a',
+	snakeHead: '@',
+	snakeTail: 'O'
+}
+
 function generateEmptyField(hieght,width){
 	var table = []
 	for (var row = 0; row <= hieght; row++) {
 		table[row] = []
 		for (var column = 0; column <= width; column++) {
 			if(row == 0 || row == hieght){
-				table[row][column] = '='
+				table[row][column] = symbols.borders.upDown
 			}else if(column == 0 || column == width){
-				table[row][column] = '|'
+				table[row][column] = symbols.borders.leftRight
 			}else{
-				table[row][column] = '+'
+				table[row][column] = symbols.blankSpace
 			}
 		}
 	}

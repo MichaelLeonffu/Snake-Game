@@ -1,13 +1,13 @@
 {
-  "name": "worm-game",
+  "name": "snake-game",
   "version": "0.1.0",
-  "description": "This is a worm game in CLI made with node js in order to learn machine learning, ironically.",
-  "main": "worm.js",
+  "description": "This is a snake game in CLI made with node js in order to learn machine learning, ironically.",
+  "main": "snake.js",
   "scripts": {
-    "start": "nodemon worm.js"
+    "start": "nodemon snake.js"
   },
   "keywords": [
-    "worm",
+    "snake",
     "game",
     "CLI",
     "machine",

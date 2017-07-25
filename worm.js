@@ -13,13 +13,13 @@ function generateEmptyField(hieght,width){
 	var table = []
 	for (var row = 0; row <= hieght; row++) {
 		table[row] = []
-		for (var column = 0; column <= width * 2; column++) {
+		for (var column = 0; column <= width; column++) {
 			if(row == 0 || row == hieght){
 				table[row][column] = '='
-			}else if(column == 0 || column == width * 2){
+			}else if(column == 0 || column == width){
 				table[row][column] = '|'
 			}else{
-				table[row][column] = column%2 ? ' ' : '+'
+				table[row][column] = '+'
 			}
 		}
 	}
@@ -28,7 +28,7 @@ function generateEmptyField(hieght,width){
 
 	//Maybe make this use paramters as a single json or seomthing?
 function fieldEditor(field,row,column,changeTo,changeFrom = 'DEFAULT'){
-	if(field[row][column*2] == changeFrom || changeFrom == 'DEFAULT'){ field[row][column*2] = changeTo }
+	if(field[row][column] == changeFrom || changeFrom == 'DEFAULT'){ field[row][column] = changeTo }
 	return field
 }
 
@@ -44,8 +44,8 @@ function tablePrinter(table){
 	for (var row = 0; row < table.length; row++) {
 		printableTable[row] = ''
 		for (var column = 0; column < table[row].length; column++) {
-			table[row][column]
 			printableTable[row] += table[row][column]
+			if(column !== table[row].length-1){printableTable[row] += ' '}
 		}
 		console.log(printableTable[row])
 	}

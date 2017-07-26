@@ -127,10 +127,10 @@ function updateSnakeField(field,snake){
 		if(snake.tail[segment] === 3 || snake.tail[segment] === 4){finalTailColumn += snake.tail[segment] === 3 ? 1 : -1}
 	}
 	//Clean this; clears all things around last tail bit.
-	if(updatedSnakeField[finalTailRow+1][finalTailColumn] !== symbols.borders.upDown && updatedSnakeField[finalTailRow+1][finalTailColumn] !== symbols.borders.leftRight){ updatedSnakeField = fieldEditor(updatedSnakeField,finalTailRow+1,finalTailColumn,symbols.blankSpace) }
-	if(updatedSnakeField[finalTailRow-1][finalTailColumn] !== symbols.borders.upDown && updatedSnakeField[finalTailRow-1][finalTailColumn] !== symbols.borders.leftRight){ updatedSnakeField = fieldEditor(updatedSnakeField,finalTailRow-1,finalTailColumn,symbols.blankSpace) }
-	if(updatedSnakeField[finalTailRow][finalTailColumn+1] !== symbols.borders.upDown && updatedSnakeField[finalTailRow][finalTailColumn+1] !== symbols.borders.leftRight){ updatedSnakeField = fieldEditor(updatedSnakeField,finalTailRow,finalTailColumn+1,symbols.blankSpace) }
-	if(updatedSnakeField[finalTailRow][finalTailColumn-1] !== symbols.borders.upDown && updatedSnakeField[finalTailRow][finalTailColumn-1] !== symbols.borders.leftRight){ updatedSnakeField = fieldEditor(updatedSnakeField,finalTailRow,finalTailColumn-1,symbols.blankSpace) }
+	updatedSnakeField = fieldEditor(updatedSnakeField,finalTailRow+1,finalTailColumn,symbols.blankSpace,symbols.snakeTail)
+	updatedSnakeField = fieldEditor(updatedSnakeField,finalTailRow-1,finalTailColumn,symbols.blankSpace,symbols.snakeTail)
+	updatedSnakeField = fieldEditor(updatedSnakeField,finalTailRow,finalTailColumn+1,symbols.blankSpace,symbols.snakeTail)
+	updatedSnakeField = fieldEditor(updatedSnakeField,finalTailRow,finalTailColumn-1,symbols.blankSpace,symbols.snakeTail)
 
 	for (var segment = 0; segment < snake.tail.length; segment++) {
 		if(snake.tail[segment] === 1 || snake.tail[segment] === 2){tailRow += snake.tail[segment] === 1 ? 1 : -1}
@@ -200,7 +200,7 @@ for (var actionCount = 0; actionCount < 300; actionCount++) {
 
 	snake = snakeController(field,snake,randomDirection)
 	field = updateSnakeField(field,snake)
-	wait(20)
+	wait(100)
 	tablePrinter(field)
 	if(gameSituation(snake) === 'dead'){
 		console.log('GAME OVER')

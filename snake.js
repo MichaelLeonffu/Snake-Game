@@ -16,11 +16,14 @@ var symbols = {
 		upDown: '\033[0m='
 	},
 	blankSpace: '\033[0;31m+',
+	placeholder:'\033[0;31m█',
 	apple: '\033[0ma',
 	snakeHead: '\033[0m@',
 	snakeTail: '\033[0mO'
 }
-var directions = {
+
+//Though this is never used.
+var snakeDirections = {
 	up: 1,
 	down: 2,
 	left: 3,
@@ -56,7 +59,7 @@ var snake = {
 		row: -1,
 		column: -1
 	},
-	tail: [1,1,1,1],
+	tail: [1,1,1,4,2,2,2,4,1,1,1],
 	occupying: 'blankSpace'
 }
 
@@ -151,11 +154,22 @@ function gameSituation(snake){
 
 	//Maybe make this use paramters as a single json or seomthing?
 function fieldEditor(field,row,column,changeTo,changeFrom = 'DEFAULT'){
-	if(field[row][column] == changeFrom || changeFrom == 'DEFAULT'){ field[row][column] = changeTo }
+	try{
+		if(field[row][column] == changeFrom || changeFrom == 'DEFAULT'){ field[row][column] = changeTo }
+	}catch(err){
+		console.log('row',row)
+		console.log('column',column)
+		wait(1000)
+	}
+	//if(field[row][column] == changeFrom || changeFrom == 'DEFAULT'){ field[row][column] = changeTo }
 	return field
 }
 
-field = generateEmptyField(10,10)
+function generateApple(){
+
+}
+
+field = generateEmptyField(15,15)
 tablePrinter(field)
 //snake = snakeController(field,snake,4)
 //field = updateSnakeField(field,snake)

@@ -1,14 +1,15 @@
 var stdin = process.openStdin();
 
-stdin.addListener("data", function(d) {
-	// note:  d is an object, and when converted to a string it will
-	// end with a linefeed.  so we (rather crudely) account for that  
-	// with toString() and then trim()
-	process.stdout.write('\033c') 
-	console.log(d)
-	console.log("you entered: [" + d.toString().trim() + "]");
-});
+// stdin.addListener("data", function(d) {
+// 	// note:  d is an object, and when converted to a string it will
+// 	// end with a linefeed.  so we (rather crudely) account for that  
+// 	// with toString() and then trim()
+// 	process.stdout.write('\033c') 
+// 	console.log(d)
+// 	console.log("you entered: [" + d.toString().trim() + "]");
+// });
 
+//Graphics! : D
 var symbols = {
 	borders:{
 		leftRight: '\033[0m|',
@@ -42,8 +43,6 @@ function generateEmptyField(height,width){
 				table[row][column] = symbols.borders.upDown
 			}else if(column === 0 || column === width){
 				table[row][column] = symbols.borders.leftRight
-			}else if(column === Math.round(width/2) && row === Math.round(height/2)){
-				table[row][column] = symbols.snakeHead
 			}else{
 				table[row][column] = symbols.blankSpace
 			}
@@ -52,27 +51,103 @@ function generateEmptyField(height,width){
 	return table
 }
 
-function snakeController(field,snake,direction){
-	const DEFAULTCORDS = {
-		row: 0,
-		column: 0
-	}
-	var snake = {
-		headPOS: DEFAULTCORDS,
-		tailPOS: DEFAULTCORDS
-	}
-	findingSnakeHead:
-	for (var row = 0; row <= field.length; row++) {
-		for (var column = 0; column <= field[row].length; column++) {
-			if(symbols.snakeHead == field[row][column]){
-				snake.headPOS.row = row
-				snake.tailPOS.column = column
-				break findingSnakeHead
-			}
-		}
-	}
+var snake = {
+	headPOS: {
+		row: -1,
+		column: -1
+	},
+	tail: [1,1,1,1],
+	occupying: 'blankSpace'
 }
 
+function print(input,print = true){
+	if(print){console.log(input)}
+}
+
+function snakeController(field,snake,direction,apple = false){
+	var backwards = false
+
+	//init snake
+	if(snake.headPOS.row === -1 && snake.headPOS.column === -1 ){
+		//-1 is because the walls count as a row and column
+		snake.headPOS.row = Math.round(field.length/2) -1
+		snake.headPOS.column = Math.round(field[0].length/2) -1
+	}
+
+	switch (direction) {
+		case 1:
+			if(2 === snake.tail[0]){
+				backwards = true				
+				break
+			}
+			snake.headPOS.row -= 1
+			break
+		case 2:
+			if(1 === snake.tail[0]){
+				backwards = true
+				break
+			}
+			snake.headPOS.row += 1
+			break
+		case 3:
+			if(4 === snake.tail[0]){
+				backwards = true
+				break
+			}
+			snake.headPOS.column -= 1
+			break
+		case 4:
+			if(3 === snake.tail[0]){
+				backwards = true
+				break
+			}
+			snake.headPOS.column += 1
+			break
+		default:
+			console.log('NO VAILD DIRECTION')
+	}
+
+	//update snake if it didn't go backwards
+	if(backwards === false){
+		snake.occupying = field[snake.headPOS.row][snake.headPOS.column]
+		snake.tail.unshift(direction)
+		if(apple === false){snake.tail.pop()}
+	}
+	return snake
+}
+
+function updateSnakeField(field,snake){
+	var updatedSnakeField = field
+	var tailRow = snake.headPOS.row,
+		tailColumn = snake.headPOS.column,
+		finalTailRow = snake.headPOS.row,
+		finalTailColumn = snake.headPOS.column
+	for (var segment = 0; segment < snake.tail.length; segment++) {
+		if(snake.tail[segment] === 1 || snake.tail[segment] === 2){finalTailRow += snake.tail[segment] === 1 ? 1 : -1}
+		if(snake.tail[segment] === 3 || snake.tail[segment] === 4){finalTailColumn += snake.tail[segment] === 3 ? 1 : -1}
+	}
+	//Clean this; clears all things around last tail bit.
+	if(updatedSnakeField[finalTailRow+1][finalTailColumn] !== symbols.borders.upDown && updatedSnakeField[finalTailRow+1][finalTailColumn] !== symbols.borders.leftRight){ updatedSnakeField = fieldEditor(updatedSnakeField,finalTailRow+1,finalTailColumn,symbols.blankSpace) }
+	if(updatedSnakeField[finalTailRow-1][finalTailColumn] !== symbols.borders.upDown && updatedSnakeField[finalTailRow-1][finalTailColumn] !== symbols.borders.leftRight){ updatedSnakeField = fieldEditor(updatedSnakeField,finalTailRow-1,finalTailColumn,symbols.blankSpace) }
+	if(updatedSnakeField[finalTailRow][finalTailColumn+1] !== symbols.borders.upDown && updatedSnakeField[finalTailRow][finalTailColumn+1] !== symbols.borders.leftRight){ updatedSnakeField = fieldEditor(updatedSnakeField,finalTailRow,finalTailColumn+1,symbols.blankSpace) }
+	if(updatedSnakeField[finalTailRow][finalTailColumn-1] !== symbols.borders.upDown && updatedSnakeField[finalTailRow][finalTailColumn-1] !== symbols.borders.leftRight){ updatedSnakeField = fieldEditor(updatedSnakeField,finalTailRow,finalTailColumn-1,symbols.blankSpace) }
+
+	for (var segment = 0; segment < snake.tail.length; segment++) {
+		if(snake.tail[segment] === 1 || snake.tail[segment] === 2){tailRow += snake.tail[segment] === 1 ? 1 : -1}
+		if(snake.tail[segment] === 3 || snake.tail[segment] === 4){tailColumn += snake.tail[segment] === 3 ? 1 : -1}
+		updatedSnakeField = fieldEditor(updatedSnakeField,tailRow,tailColumn,symbols.snakeTail)
+	}
+
+	updatedSnakeField = fieldEditor(field,snake.headPOS.row,snake.headPOS.column,symbols.snakeHead)
+
+	//fieldEditor(field,snake.headPOS.row + snake.tail[0] === 1 ? 1 : -1,snake.headPOS.column + snake.tail[0] === 3 ? 1 : -1,symbols.snakeTail)
+
+	return updatedSnakeField
+}
+
+function gameSituation(snake){
+	return snake.occupying === symbols.borders.upDown || snake.occupying === symbols.borders.leftRight || snake.occupying === symbols.snakeTail ? 'dead' : 'alive' //alive or dead
+}
 
 	//Maybe make this use paramters as a single json or seomthing?
 function fieldEditor(field,row,column,changeTo,changeFrom = 'DEFAULT'){
@@ -80,13 +155,58 @@ function fieldEditor(field,row,column,changeTo,changeFrom = 'DEFAULT'){
 	return field
 }
 
-generatedTable = generateEmptyField(55,55)
+field = generateEmptyField(10,10)
+tablePrinter(field)
+//snake = snakeController(field,snake,4)
+//field = updateSnakeField(field,snake)
+//tablePrinter(field)
 
-//tablePrinterDelay(generatedTable,1)
-tablePrinterCursor(generatedTable,1)
+main:
+for (var actionCount = 0; actionCount < 300; actionCount++) {
+	var randomDirection = 0
+	randomDirection = Math.floor(Math.random()*4)+1
+	searching = true
+	var been1 = false,
+		been2 = false,
+		been3 = false,
+		been4 = false
+	while(searching){
+		if(snake.headPOS.row !== -1 && snake.headPOS.column !== -1){
+			if(randomDirection === 1){been1 = true}
+			if(randomDirection === 2){been2 = true}
+			if(randomDirection === 3){been3 = true}
+			if(randomDirection === 4){been4 = true}
+			if(
+				(field[snake.headPOS.row][snake.headPOS.column+1] === symbols.snakeTail && randomDirection === 4) ||
+				(field[snake.headPOS.row][snake.headPOS.column-1] === symbols.snakeTail && randomDirection === 3) ||
+				(field[snake.headPOS.row+1][snake.headPOS.column] === symbols.snakeTail && randomDirection === 2) ||
+				(field[snake.headPOS.row-1][snake.headPOS.column] === symbols.snakeTail && randomDirection === 1) ||
+				(field[snake.headPOS.row][snake.headPOS.column+1] === symbols.borders.leftRight && randomDirection === 4) ||
+				(field[snake.headPOS.row][snake.headPOS.column-1] === symbols.borders.leftRight && randomDirection === 3) ||
+				(field[snake.headPOS.row+1][snake.headPOS.column] === symbols.borders.upDown && randomDirection === 2) ||
+				(field[snake.headPOS.row-1][snake.headPOS.column] === symbols.borders.upDown && randomDirection === 1)
+				){
+				randomDirection = Math.floor(Math.random()*4)+1
+			}else{
+				searching = false
+			}
+			if(been1&&been2&&been3&&been4){
+				searching = false
+			}
+		}else{
+			searching = false
+		}
+	}
 
-// generatedTable = fieldEditor(generatedTable, 41, 40, symbols.snakeHead)
-// generatedTable = fieldEditor(generatedTable, 40, 40, symbols.snakeTail)
+	snake = snakeController(field,snake,randomDirection)
+	field = updateSnakeField(field,snake)
+	wait(20)
+	tablePrinter(field)
+	if(gameSituation(snake) === 'dead'){
+		console.log('GAME OVER')
+		break main
+	}
+}
 
 function tablePrinter(table){
 	process.stdout.write('\033c')
@@ -99,9 +219,10 @@ function tablePrinter(table){
 		}
 		console.log(printableTable[row])
 	}
-
 }
 
+
+//TODO: Make a more effetive print (which doesnt need to refresh whole screen to move worm low proiorty)
 
 function tablePrinterDelay(table,delay = 0){
 	process.stdout.write('\033c')
@@ -117,7 +238,6 @@ function tablePrinterDelay(table,delay = 0){
 			for (var rowPrint = 0; rowPrint < printableTable.length; rowPrint++) {
 				console.log(printableTable[rowPrint])
 			}
-
 		}
 	}
 }
@@ -131,7 +251,6 @@ function tablePrinterCursor(table,delay = 0){
 			printableTable[row] += table[row][column]
 			if(delay !== 0){wait(delay)}
 			process.stdout.write('\033[' + (row+1) + ';' + (column*2+1) + 'H' + table[row][column])
-			//process.stdout.write('\033c')
 		}
 	}
 }

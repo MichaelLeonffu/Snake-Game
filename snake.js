@@ -10,16 +10,29 @@ var stdin = process.openStdin();
 // });
 
 //Graphics! : D
+
+/*
+ Will bring back once a better print is created.
+borders:{
+	leftRight: '\033[0m┃',
+	upDown: '\033[0m━',
+	topRight: '\033[0m┓',
+	bottomRight: '\033[0m┛',
+	topLeft: '\033[0m┏',
+	bottomLeft: '\033[0m┗'
+}
+*/
+
 var symbols = {
 	borders:{
-		leftRight: '\033[0m┃',
-		upDown: '\033[0m━',
-		topRight: '\033[0m┓',
-		bottomRight: '\033[0m┛',
-		topLeft: '\033[0m┏',
-		bottomLeft: '\033[0m┗'
+		leftRight: '\033[0m|',
+		upDown: '\033[0m=',
+		topRight: '\033[0m=',
+		bottomRight: '\033[0m=',
+		topLeft: '\033[0m=',
+		bottomLeft: '\033[0m='
 	},
-	blankSpace: '\033[0;30m+',
+	blankSpace: '\033[0;30m ',
 	placeholder:'\033[0;40m█',
 	apple: '\033[0;31m',
 	snakeHead: '\033[0m@',
@@ -161,6 +174,19 @@ function updateSnakeField(field,snake){
 }
 
 function gameSituation(snake){
+	/*
+	var situaion = 'alive'
+	//If snake is touching any of the borders
+	for(borders in symbols.borders){
+		if(snake.occupying === symbols.borders[borders]){
+			situaion = 'dead'
+			break
+		}
+	}
+	//If snake is touching snake tail
+	if(snake.occupying === symbols.snakeTail){situaion = 'dead'}
+	*/
+	//return situaion//alive or dead
 	return snake.occupying === symbols.borders.upDown || snake.occupying === symbols.borders.leftRight || snake.occupying === symbols.snakeTail ? 'dead' : 'alive' //alive or dead
 }
 
@@ -186,7 +212,7 @@ tablePrinter(field)
 //snake = snakeController(field,snake,4)
 //field = updateSnakeField(field,snake)
 //tablePrinter(field)
-/*
+
 main:
 for (var actionCount = 0; actionCount < 300; actionCount++) {
 	var randomDirection = 0
@@ -226,14 +252,14 @@ for (var actionCount = 0; actionCount < 300; actionCount++) {
 
 	snake = snakeController(field,snake,randomDirection)
 	field = updateSnakeField(field,snake)
-	wait(100)
+	wait(50)
 	tablePrinter(field)
 	if(gameSituation(snake) === 'dead'){
 		console.log('GAME OVER')
 		break main
 	}
 }
-*/
+
 
 
 function tablePrinter(table){

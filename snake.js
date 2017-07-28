@@ -15,9 +15,9 @@ var symbols = {
 		leftRight: '\033[0m|',
 		upDown: '\033[0m='
 	},
-	blankSpace: '\033[0;31m+',
-	placeholder:'\033[0;31m█',
-	apple: '\033[0ma',
+	blankSpace: '\033[0;30m+',
+	placeholder:'\033[0;40m█',
+	apple: '\033[0;31m',
 	snakeHead: '\033[0m@',
 	snakeTail: '\033[0mO'
 }
@@ -165,8 +165,8 @@ function fieldEditor(field,row,column,changeTo,changeFrom = 'DEFAULT'){
 	return field
 }
 
-function generateApple(){
-
+function generateApple(appleSeed){
+	
 }
 
 field = generateEmptyField(15,15)

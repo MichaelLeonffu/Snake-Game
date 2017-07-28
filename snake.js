@@ -23,6 +23,8 @@ borders:{
 }
 */
 
+var appleBasket = require('./appleBasket/appleBasket.js')
+
 var symbols = {
 	borders:{
 		leftRight: '\033[0m|',
@@ -32,12 +34,15 @@ var symbols = {
 		topLeft: '\033[0m=',
 		bottomLeft: '\033[0m='
 	},
-	blankSpace: '\033[0;30m ',
+	blankSpace: '\033[0;30m+',
 	placeholder:'\033[0;40m█',
 	apple: '\033[0;31m',
 	snakeHead: '\033[0m@',
 	snakeTail: '\033[0mO'
 }
+
+var exports = module.exports = {}
+exports.symbols = symbols
 
 //Though this is never used.
 var snakeDirections = {
@@ -45,6 +50,15 @@ var snakeDirections = {
 	down: 2,
 	left: 3,
 	right: 4
+}
+
+var snake = {
+	headPOS: {
+		row: -1,
+		column: -1
+	},
+	tail: [1],
+	occupying: 'blankSpace'
 }
 
 function wait(timeInMilli){
@@ -79,20 +93,11 @@ function generateEmptyField(height,width){
 	return table
 }
 
-var snake = {
-	headPOS: {
-		row: -1,
-		column: -1
-	},
-	tail: [1,1,1,4,2,2,2,4,1,1,1],
-	occupying: 'blankSpace'
-}
-
 function print(input,print = true){
 	if(print){console.log(input)}
 }
 
-function snakeController(field,snake,direction,apple = false){
+function snakeController(field,snake,direction = 0,apple = false){
 	var backwards = false
 
 	//init snake
@@ -173,21 +178,30 @@ function updateSnakeField(field,snake){
 	return updatedSnakeField
 }
 
-function gameSituation(snake){
-	/*
-	var situaion = 'alive'
-	//If snake is touching any of the borders
-	for(borders in symbols.borders){
-		if(snake.occupying === symbols.borders[borders]){
-			situaion = 'dead'
-			break
+function gameSituation(game,situation = 'alive'){
+
+	if(situation !== 'init'){
+		//If snake is touching any of the borders
+		for(borders in symbols.borders){
+			if(game.snake.occupying === symbols.borders[borders]){
+				situation = 'dead'
+				break
+			}
+		}
+		//If snake is touching snake tail
+		if(game.snake.occupying === symbols.snakeTail){situation = 'dead'}
+
+		if(game.snake.occupying === symbols.apple){
+			situation = 'apple'
+			console.log('GOT APPLE!')
+			wait(1000)
 		}
 	}
-	//If snake is touching snake tail
-	if(snake.occupying === symbols.snakeTail){situaion = 'dead'}
-	*/
-	//return situaion//alive or dead
-	return snake.occupying === symbols.borders.upDown || snake.occupying === symbols.borders.leftRight || snake.occupying === symbols.snakeTail ? 'dead' : 'alive' //alive or dead
+	
+	game.situation = situation
+
+	return game//alive or dead or apple
+	//return snake.occupying === symbols.borders.upDown || snake.occupying === symbols.borders.leftRight || snake.occupying === symbols.snakeTail ? 'dead' : 'alive' //alive or dead
 }
 
 	//Maybe make this use paramters as a single json or seomthing?
@@ -203,18 +217,51 @@ function fieldEditor(field,row,column,changeTo,changeFrom = 'DEFAULT'){
 	return field
 }
 
-function generateApple(appleSeed){
-	
+function generateApple(game){
+	if(game.situation === 'apple' || game.situation === 'init'){
+		game = appleBasket.basicAppleLeftApple(game)
+	}
+	return game
 }
 
-field = generateEmptyField(15,15)
-tablePrinter(field)
+function snakeGame(){
+	var game = {}
+	game.symbols = symbols
+	var gameIsRunning = true
+	//Game init:
+	gameSituation(game,'init')
+	game.field = generateEmptyField(15,15)
+	game = generateApple(game)
+	game.snake = snake
+	while(gameIsRunning){
+		snake = snakeController(game.field,snake, bruteSnake(game))
+		game.snake = snake
+		game.field = updateSnakeField(game.field,game.snake)
+		game = gameSituation(game)
+		game = generateApple(game)
+		tablePrinter(game.field)
+		wait(50)
+		//gameIsRunning = false
+		if(game.situation === 'dead'){
+			gameIsRunning = false
+		}
+	}
+	console.log('done')
+
+}
+
+snakeGame()
+//tablePrinter(field)
+
+
 //snake = snakeController(field,snake,4)
 //field = updateSnakeField(field,snake)
 //tablePrinter(field)
 
-main:
-for (var actionCount = 0; actionCount < 300; actionCount++) {
+function bruteSnake(game){
+var field = game.field
+var snake = game.snake
+
 	var randomDirection = 0
 	randomDirection = Math.floor(Math.random()*4)+1
 	searching = true
@@ -249,17 +296,8 @@ for (var actionCount = 0; actionCount < 300; actionCount++) {
 			searching = false
 		}
 	}
-
-	snake = snakeController(field,snake,randomDirection)
-	field = updateSnakeField(field,snake)
-	wait(50)
-	tablePrinter(field)
-	if(gameSituation(snake) === 'dead'){
-		console.log('GAME OVER')
-		break main
-	}
+	return randomDirection
 }
-
 
 
 function tablePrinter(table){
@@ -310,8 +348,7 @@ function tablePrinterCursor(table,delay = 0){
 }
 
 //Export Stuff
-var exports = module.exports = {}
-exports.symbols = symbols
+
 
 
 

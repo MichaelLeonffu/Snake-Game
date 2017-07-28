@@ -53,6 +53,14 @@ game = {
 		moves: 123,
 		totalApplesGenerated: 123,
 		totalApplesCollected: 123
+	},
+	game: {
+		seeds: {
+			apple: 123,
+			world: 123
+		},
+		situation: '',
+		snakeCount: ''
 	}
 }
 

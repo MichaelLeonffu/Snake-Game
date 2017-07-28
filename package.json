@@ -4,7 +4,8 @@
   "description": "This is a snake game in CLI made with node js in order to learn machine learning, ironically.",
   "main": "snake.js",
   "scripts": {
-    "start": "nodemon snake.js",
+    "start": "node snake.js",
+    "start-dev": "nodemon snake.js",
     "nodemon": "nodemon"
   },
   "keywords": [

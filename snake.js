@@ -12,8 +12,12 @@ var stdin = process.openStdin();
 //Graphics! : D
 var symbols = {
 	borders:{
-		leftRight: '\033[0m|',
-		upDown: '\033[0m='
+		leftRight: '\033[0m┃',
+		upDown: '\033[0m━',
+		topRight: '\033[0m┓',
+		bottomRight: '\033[0m┛',
+		topLeft: '\033[0m┏',
+		bottomLeft: '\033[0m┗'
 	},
 	blankSpace: '\033[0;30m+',
 	placeholder:'\033[0;40m█',
@@ -42,7 +46,15 @@ function generateEmptyField(height,width){
 	for (var row = 0; row <= height; row++) {
 		table[row] = []
 		for (var column = 0; column <= width; column++) {
-			if(row === 0 || row === height){
+			if(row === 0 && column === 0){
+				table[row][column] = symbols.borders.topLeft
+			}else if(row === height && column === 0){
+				table[row][column] = symbols.borders.bottomLeft
+			}else if(row === 0 && column === width){
+				table[row][column] = symbols.borders.topRight
+			}else if(row === height && column === width){
+				table[row][column] = symbols.borders.bottomRight
+			}else if(row === 0 || row === height){
 				table[row][column] = symbols.borders.upDown
 			}else if(column === 0 || column === width){
 				table[row][column] = symbols.borders.leftRight
@@ -174,7 +186,7 @@ tablePrinter(field)
 //snake = snakeController(field,snake,4)
 //field = updateSnakeField(field,snake)
 //tablePrinter(field)
-
+/*
 main:
 for (var actionCount = 0; actionCount < 300; actionCount++) {
 	var randomDirection = 0
@@ -221,6 +233,8 @@ for (var actionCount = 0; actionCount < 300; actionCount++) {
 		break main
 	}
 }
+*/
+
 
 function tablePrinter(table){
 	process.stdout.write('\033c')
@@ -268,3 +282,10 @@ function tablePrinterCursor(table,delay = 0){
 		}
 	}
 }
+
+//Export Stuff
+var exports = module.exports = {}
+exports.symbols = symbols
+
+
+

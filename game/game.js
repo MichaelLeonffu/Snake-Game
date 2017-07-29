@@ -1,9 +1,11 @@
 var stdin = process.openStdin();
 
-// var appleBasket = require('./appleBasket/appleBasket.js')
-
 // var exports = module.exports = {}
-//exports.symbols = symbols
+
+//Gathering Seeds
+var seedGerminate = require('./seeds/seedGerminate.js')
+//Gatering Generators
+var tree = require('./tree/tree.js')
 
 function wait(timeInMilli){
 	var duration = Math.abs(timeInMilli)
@@ -12,36 +14,56 @@ function wait(timeInMilli){
 	while(currentTime - startTime <= duration){currentTime = new Date()}
 }
 
-
-
-
-
-
-
-
-function generateEmptyField(height,width){
-	var table = []
-	for (var row = 0; row <= height; row++) {
-		table[row] = []
-		for (var column = 0; column <= width; column++) {
-			if(row === 0 && column === 0){
-				table[row][column] = symbols.borders.topLeft
-			}else if(row === height && column === 0){
-				table[row][column] = symbols.borders.bottomLeft
-			}else if(row === 0 && column === width){
-				table[row][column] = symbols.borders.topRight
-			}else if(row === height && column === width){
-				table[row][column] = symbols.borders.bottomRight
-			}else if(row === 0 || row === height){
-				table[row][column] = symbols.borders.upDown
-			}else if(column === 0 || column === width){
-				table[row][column] = symbols.borders.leftRight
-			}else{
-				table[row][column] = symbols.blankSpace
+function gameLoader(){
+	console.log('Start- ','Game Loader')
+	var game = {
+		symbols: {
+			walls: {
+				wall: 'w',
+				intersect: 'i'
+			},
+			snake: {
+				head: 'h',
+				tail: 't'
+			},
+			apple: 'a',
+			space: {
+				blank: 'b',
+				empty: 'e'
 			}
+		},
+		field: [],
+		stats: {
+			moves: 0,
+			totalApplesGenerated: 0,
+			totalApplesCollected: 0
+		},
+		game: {
+			tree: {
+				apple: 'aLeftApple',
+				world: 'wOriginal',
+				worldOptions: {
+					rows: 15,
+					columns: 15
+				},
+				snakeHeads: [
+					{
+						snakeName: 'defaultSnake',
+						row: -1,
+						column: -1,
+						snakeSymbol: '@'
+					}
+				]
+			},
+			seeds: {
+				apple: 'aUpSeed',
+				world: 'wSeed'
+			},
+			situation: 'init'
 		}
 	}
-	return table
+	console.log('End- ','Game Loader')
+	return game
 }
 
 function print(input,print = true){
@@ -168,31 +190,32 @@ function fieldEditor(field,row,column,changeTo,changeFrom = 'DEFAULT'){
 	return field
 }
 
-function generateApple(game){
-	if(game.situation === 'apple' || game.situation === 'init'){
-		game = appleBasket.basicAppleLeftApple(game)
-	}
-	return game
-}
+game()
 
-
-//GAME
-
+function game(){
 	//Clears Screen 
 	process.stdout.write('\033c')
 	//Game Init
+	console.log('SNAKE GAME!')
 	console.log('----GAME INIT----')
+	game = gameLoader()
+	//Seeds
+	game = seedGerminate.seedWorldGerminate(game)
+	game = seedGerminate.seedAppleGerminate(game)
+	//World Tree
+	game = tree.worldTree(game)
+	//game = tree.appleTree(game)
 
 	wait(1000)
 	//Clears Screen 
 	process.stdout.write('\033c')
 	//Game Run
+
 	gamePrinter(game,graphics)
-
-
+}
 
 //Printing
-graphics = {
+var graphics = {
 	walls: {
 		LURD: '\033[0;30m+',
 		LUR: '\033[0mi',
